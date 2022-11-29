@@ -1015,6 +1015,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85ecca4481ca99b43966ebd80825c210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  startMovmentScore: 3
   groundTilemap: {fileID: 1067322300}
   obstacleTilemap: {fileID: 857973057}
   cellSize: 2

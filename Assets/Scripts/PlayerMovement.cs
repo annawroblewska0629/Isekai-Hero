@@ -6,6 +6,12 @@ using UnityEngine.Tilemaps;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private float deathDealy = .5f;
+
+    [Header("MovmentScore")]
+    [SerializeField] int startMovmentScore;
+    
+    [Header("Tilemap")] 
     [SerializeField] Tilemap groundTilemap;
     [SerializeField] Tilemap obstacleTilemap;
     [SerializeField] int cellSize = 1;
@@ -18,6 +24,13 @@ public class PlayerMovement : MonoBehaviour
 
        
     }
+    private void Update()
+    {
+        if (isDead())
+        {
+            StartCoroutine(Die());
+        }
+    }
 
     private void Move(InputAction.CallbackContext context)
     {
@@ -25,13 +38,14 @@ public class PlayerMovement : MonoBehaviour
         if (CanMove(direction))
         {
             transform.position += (Vector3)direction;
+            startMovmentScore--;
         }
     }
 
     private bool CanMove(Vector2 direction)
    { 
         Vector3Int targetGridPosition = groundTilemap.WorldToCell(transform.position + (Vector3)direction);
-        if(!groundTilemap.HasTile(targetGridPosition) || obstacleTilemap.HasTile(targetGridPosition))
+        if(!groundTilemap.HasTile(targetGridPosition) || obstacleTilemap.HasTile(targetGridPosition) || isDead())
         {
             return false;
         }
@@ -39,5 +53,28 @@ public class PlayerMovement : MonoBehaviour
         {
             return true;
         }
+    }
+
+    private bool isDead()
+    {
+        if (startMovmentScore == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private IEnumerator Die()
+    {
+        yield return new WaitForSeconds(deathDealy);
+        Destroy(gameObject);
+    }
+
+    public int GetMovmentScore()
+    {
+        return startMovmentScore;
     }
 }
