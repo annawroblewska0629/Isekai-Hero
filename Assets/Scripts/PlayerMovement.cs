@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,14 +13,18 @@ public class PlayerMovement : MonoBehaviour
     [Header("MovementLimit")]
     [SerializeField] int startMovementLimit;
 
-    [Header("Tilemap")] 
-    [SerializeField] int cellSize = 1;
+     int cellSize = 2;
 
     private void Awake()
     {
         playerControls = new PlayerControls();
         playerControls.Player.Enable();
         playerControls.Player.Move.performed += Move;
+    }
+    private void Start()
+    {
+        PlayerActionSystem.Instance.OnActiveActionChanged += PlayerActionSystem_OnActiveActionChanged;
+        PlayerActionSystem.Instance.OnActiveActionDeactivation += PlayerActionSystem_OnActiveActionDeactivation;
     }
 
     private void Update()
@@ -38,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
         directionVector3 = (Vector3)directionVector2;
         Vector3 targetWorldPosition = transform.position + directionVector3;
         Vector3 behindTargetWorldPosition = transform.position + directionVector3 + directionVector3;
-        //Vector3 targetPosition = transform.position + directionVector3;
+        
         // do funkcji CanMove zostaje przekazana odczytana wartosc, gdy fukncja zwroci prawde obiekt gracza zostaje przemiszczony a limit porszania zmniejsza sie
         if (LevelGrid.Instance.IsValidGridPosition(targetWorldPosition) && !LevelGrid.Instance.IsPositionBlockedByEnemy(targetWorldPosition) )
         {
@@ -79,5 +84,24 @@ public class PlayerMovement : MonoBehaviour
     {
         // funkcja zwaraca limit porszania sie
         return startMovementLimit;
+    }
+
+    public void DisablePlayerMovment()
+    {
+        playerControls.Player.Move.Disable();
+    }
+    public void EnablePlayerMovment()
+    {
+        playerControls.Player.Move.Enable();
+    }
+
+    public void PlayerActionSystem_OnActiveActionChanged(object sender, EventArgs e)
+    {
+        DisablePlayerMovment();
+    }
+
+    public void PlayerActionSystem_OnActiveActionDeactivation(object sender,EventArgs e)
+    {
+        EnablePlayerMovment();
     }
 }
