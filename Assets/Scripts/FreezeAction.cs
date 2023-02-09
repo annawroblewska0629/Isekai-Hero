@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FreezeAction : Action
 {
-    private int cellSize = 2;
 
     [Header("ActionCastRange")]
     [SerializeField] int maxFrezzeCastRangeX;
@@ -28,17 +27,17 @@ public class FreezeAction : Action
         return "Freeze";
     }
 
-    public override List<Vector3> ActionCastRangePositionList(int maxFreezeCastRangeX, int maxFreezeCastRangeY)
+    public override List<Vector3Int> ActionCastRangePositionList()
     {
-        List<Vector3> freezeCastRangePositionList = new List<Vector3>();
-        Vector3 playerPosition = transform.position;
+        List<Vector3Int> frezzeCastRangeGridPositionList = new List<Vector3Int>();
+        Vector3Int playerPosition = LevelGrid.Instance.WorldPositionToGridPosition(transform.position);
 
-        for (int x = -maxFreezeCastRangeX; x <= maxFreezeCastRangeX; x = x + cellSize)
+        for (int x = -maxFrezzeCastRangeX; x <= maxFrezzeCastRangeX; x ++)
         {
-            for (int y = -maxFreezeCastRangeY; y <= maxFreezeCastRangeY; y = y + cellSize)
+            for (int y = -maxFreezeCastRangeY; y <= maxFreezeCastRangeY; y ++)
             {
-                Vector3 offsetPosition = new Vector3(x, y, 0);
-                Vector3 testGridPosition = playerPosition + offsetPosition;
+                Vector3Int offsetPosition = new Vector3Int(x, y, 0);
+                Vector3Int testGridPosition = playerPosition + offsetPosition;
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
                 {
                     continue;
@@ -48,18 +47,34 @@ public class FreezeAction : Action
                     continue;
                 }
 
-                freezeCastRangePositionList.Add(testGridPosition);
+                frezzeCastRangeGridPositionList.Add(testGridPosition);
             }
         }
-
-        return freezeCastRangePositionList;
-    }
-    public override List<Vector3> GetAcionCastRangePositionList()
-    {
-        return ActionCastRangePositionList(maxFrezzeCastRangeX, maxFreezeCastRangeY);
+        return frezzeCastRangeGridPositionList;
+      
     }
     public override ActionGridVisual.ColorType GetActionCastRangeColorType()
     {
         return actionColorType;
+    }
+
+    public override void TakeAction(Vector3Int actionCastPosition)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override int GetActionPointsCost()
+    {
+        return 4;
+    }
+
+    public override List<Vector3Int> ActionEffectRangePositionList(Vector3Int gridPosition)
+    {
+        List<Vector3Int> frezzeEffectGridPositionList = new List<Vector3Int>();
+        if (isValidActionCastPosition(gridPosition))
+        {
+            frezzeEffectGridPositionList.Add(gridPosition);
+        }
+        return frezzeEffectGridPositionList;
     }
 }

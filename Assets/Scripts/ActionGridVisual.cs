@@ -9,9 +9,12 @@ public class ActionGridVisual : MonoBehaviour
  
     // public static AttackCastRangeVisual Instance { get; private set; }
     [SerializeField] Tilemap actionCastRangeTileMap;
+    [SerializeField] Tilemap actionEffectRangeTileMap;
     [SerializeField] private List<ColorTypeTileBase> colorTypeTileBaseList;
-   
-    
+    [SerializeField] TileBase actionEffectRangeTileBase;
+    Vector3Int lastMouseGridPosition;
+    private bool isActionActive = false;
+
     [Serializable]
     public struct ColorTypeTileBase
     {
@@ -25,10 +28,10 @@ public class ActionGridVisual : MonoBehaviour
         Red,
     }
 
-
+    
     void Start()
     {
-        /* if (Instance != null)
+      /* if (Instance != null)
          {
              Debug.LogError("There is more than one AttackCastRangeVisual!" + transform + " - " + Instance);
              Destroy(gameObject);
@@ -38,6 +41,24 @@ public class ActionGridVisual : MonoBehaviour
         */
         PlayerActionSystem.Instance.OnActiveActionChanged += PlayerActionSystem_OnActiveActionChanged;
         PlayerActionSystem.Instance.OnActiveActionDeactivation += PlayerActionSystem_OnActiveActionDeactivation;
+    }
+
+    private void Update()
+    {
+        if (!isActionActive)
+        {
+            return;
+        }
+        if(MousePosition.GetMouseGridPosition() != lastMouseGridPosition)
+        {
+
+            lastMouseGridPosition = MousePosition.GetMouseGridPosition();
+            actionEffectRangeTileMap.ClearAllTiles();
+            Action activeAction = PlayerActionSystem.Instance.GetActiveAction();
+            ShowActionEffectRangeVisual(activeAction.ActionEffectRangePositionList(lastMouseGridPosition));
+     
+        }
+     
     }
 
     private TileBase GetColorTypeTileBase(ColorType colorType)
@@ -54,18 +75,28 @@ public class ActionGridVisual : MonoBehaviour
         return null;
     }
 
-    private void ShowActionCastRangeVisual(List<Vector3> actionCastRangePositionList, ColorType colorType)
+    private void ShowActionEffectRangeVisual(List<Vector3Int> actionEffectRangePositionList)
+    {
+
+        foreach (Vector3Int gridPosition in actionEffectRangePositionList)
+        {
+
+            actionEffectRangeTileMap.SetTile(gridPosition, actionEffectRangeTileBase);
+
+        }
+
+    }
+
+    private void ShowActionCastRangeVisual(List<Vector3Int> actionCastRangePositionList, ColorType colorType)
     {
         
-            foreach (Vector3 worldPosition in actionCastRangePositionList)
+            foreach (Vector3Int gridPosition in actionCastRangePositionList)
             {
-                Vector3Int gridPosition = actionCastRangeTileMap.WorldToCell(worldPosition);
 
                 actionCastRangeTileMap.SetTile(gridPosition, GetColorTypeTileBase(colorType));
 
             }
-       
-    
+
     }
 
     private void DeleteActionCastRangeVisual()
@@ -80,16 +111,18 @@ public class ActionGridVisual : MonoBehaviour
         Action activeAction = PlayerActionSystem.Instance.GetActiveAction();
        
         //actionCastRangePositionList = activeAction.ActionCastRangePositionList();
-        ShowActionCastRangeVisual(activeAction.GetAcionCastRangePositionList(), activeAction.GetActionCastRangeColorType());
+        ShowActionCastRangeVisual(activeAction.ActionCastRangePositionList(), activeAction.GetActionCastRangeColorType());
     }
 
     private void PlayerActionSystem_OnActiveActionChanged(object sender, EventArgs e)
     {
         UpdateActionCastRangeVisual();
-        Debug.Log("o");
+        isActionActive = true;
     }
     private void PlayerActionSystem_OnActiveActionDeactivation(object sender, EventArgs e)
     {
         DeleteActionCastRangeVisual();
+        isActionActive = false;
+        actionEffectRangeTileMap.ClearAllTiles();
     }
 }

@@ -14,10 +14,21 @@ public abstract class Action : MonoBehaviour
 
     public abstract string GetActionName();
 
+    public abstract int GetActionPointsCost();
+
     public abstract ActionGridVisual.ColorType GetActionCastRangeColorType();
 
-    public abstract List<Vector3> GetAcionCastRangePositionList();
+    public abstract List<Vector3Int> ActionCastRangePositionList();
 
-    public abstract List<Vector3> ActionCastRangePositionList(int maxAttackCastRangeX, int maxAttackCastRangeY);
+    public abstract List<Vector3Int> ActionEffectRangePositionList(Vector3Int gridPosition);
+
+    public virtual bool isValidActionCastPosition(Vector3Int actionCastPosition)
+    {
+        List<Vector3Int> actionCastRangePositionList = ActionCastRangePositionList();
+        return actionCastRangePositionList.Contains(actionCastPosition);
+
+    }
+
+    public abstract void TakeAction(Vector3Int actionCastPosition);
 
 }

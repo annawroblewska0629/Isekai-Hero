@@ -4,19 +4,17 @@ using UnityEngine;
 
 public class AttackAction : Action
 {
-    private int cellSize = 2;
 
     [Header("ActionCastRange")]
     [SerializeField] int maxAttackCastRangeX;
     [SerializeField] int maxAttackCastRangeY;
+    [SerializeField] int maxAttackEffectRangeY;
     [SerializeField]ActionGridVisual.ColorType actionColorType; 
-    //PlayerMovement playerMovement;
-    //ActionCastRangeVisual actionCastRangeVisual;
+    
     // Start is called before the first frame update
     void Start()
     {
-        //playerMovement = FindObjectOfType<PlayerMovement>();
-        //actionCastRangeVisual = FindObjectOfType<ActionCastRangeVisual>();
+     
     }
 
     // Update is called once per frame
@@ -30,17 +28,17 @@ public class AttackAction : Action
         return "Attack";
     }
 
-    public override List<Vector3> ActionCastRangePositionList(int maxAttackCastRangeX, int maxAttackCastRangeY)
+    public override List<Vector3Int> ActionCastRangePositionList()
     {
-        List<Vector3> attackCastRangePositionList = new List<Vector3>();
-        Vector3 playerPosition = transform.position;
+        List<Vector3Int> attackCastRangeGridPositionList = new List<Vector3Int>();
+        Vector3Int playerPosition = LevelGrid.Instance.WorldPositionToGridPosition(transform.position);
 
-        for (int x = -maxAttackCastRangeX; x <= maxAttackCastRangeX; x = x + cellSize)
+        for (int x = -maxAttackCastRangeX; x <= maxAttackCastRangeX; x++)
         {
-            for (int y = -maxAttackCastRangeY; y <= maxAttackCastRangeY; y = y + cellSize)
+            for (int y = -maxAttackCastRangeY; y <= maxAttackCastRangeY; y++)
             {
-                Vector3 offsetPosition = new Vector3(x, y, 0);
-                Vector3 testGridPosition = playerPosition + offsetPosition;
+                Vector3Int offsetPosition = new Vector3Int(x, y, 0);
+                Vector3Int testGridPosition = playerPosition + offsetPosition;
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
                 {
                     continue;
@@ -50,11 +48,10 @@ public class AttackAction : Action
                     continue;
                 }
 
-                attackCastRangePositionList.Add(testGridPosition);
+                attackCastRangeGridPositionList.Add(testGridPosition);
             }
         }
-
-        return attackCastRangePositionList;
+        return attackCastRangeGridPositionList;
     }
 
     public override ActionGridVisual.ColorType GetActionCastRangeColorType()
@@ -62,31 +59,46 @@ public class AttackAction : Action
         return actionColorType;
     }
 
-    public override List<Vector3> GetAcionCastRangePositionList()
+
+    public override void TakeAction(Vector3Int actionCastPosition)
     {
-        return ActionCastRangePositionList(maxAttackCastRangeX, maxAttackCastRangeY);
+        foreach(Vector3Int gridPosition in ActionEffectRangePositionList(actionCastPosition))
+        {
+            if (LevelGrid.Instance.IsPositionBlockedByEnemy(gridPosition))
+            {
+                Enemy enemy = LevelGrid.Instance.GetEnemyAtPosition(gridPosition);
+                enemy.Damage(1);
+            }
+        }
+        
     }
 
-    /*  public void OnAndOffAttackCastRangeVisual()
-      {
-          if (!isAttackCastRangeActive)
-          {
-              isAttackCastRangeActive = true;
-              playerMovement.EnablePlayerMovment();
-              //AttackCastRangeVisual.Instance.DeleteAttackCastRangeVisual();
-              actionCastRangeVisual.DeleteActionCastRangeVisual();
-              Debug.Log("raz");
-          }
-          else if (isAttackCastRangeActive)
-          {
-              //AttackCastRangeVisual.Instance.ShowAttackCastRange(AttackCastRangePositionList(maxAttackCastRangeX, maxAttackCastRangeY));
-              actionCastRangeVisual.ShowActionCastRange(ActionCastRangePositionList(maxAttackCastRangeX, maxAttackCastRangeY),ActionCastRangeVisual.Color.Red);
-              playerMovement.DisablePlayerMovment();
-              isAttackCastRangeActive = false;
-              Debug.Log("dwa");
-          }
-         */
+    public override int GetActionPointsCost()
+    {
+        return 5;
+    }
 
+    public override List<Vector3Int> ActionEffectRangePositionList(Vector3Int gridPosition)
+    {
+        List<Vector3Int> atackEffectGridPositionList = new List<Vector3Int>();
+        if (isValidActionCastPosition(gridPosition))
+        {
+            for (int y = 0; y <= maxAttackEffectRangeY; y++)
+            {
+
+                Vector3Int offsetGridPosition = new Vector3Int(0, y, 0);
+                Vector3Int testGridPosition = gridPosition + offsetGridPosition;
+
+                if (!LevelGrid.Instance.IsGroundAtGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                atackEffectGridPositionList.Add(testGridPosition);
+
+            }
+        }
+        return atackEffectGridPositionList;
+    }
 }
 
 

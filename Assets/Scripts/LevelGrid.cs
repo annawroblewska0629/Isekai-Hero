@@ -6,15 +6,18 @@ using UnityEngine.Tilemaps;
 public class LevelGrid : MonoBehaviour
 {
     public static LevelGrid Instance { get; private set; }
-    [SerializeField] List<Transform> enemiesWorldPositions = new List<Transform>();
-    List<Vector3Int> enemiesGridPositionsList = new List<Vector3Int>();
-    [SerializeField] Grid grid;
-
+    private Dictionary<Vector3Int, Enemy> enemiesGridPositionDictionary = new Dictionary<Vector3Int, Enemy>();
+    [SerializeField] private Grid grid;
+    
     [Header("Tilemap")]
-    [SerializeField] Tilemap groundTilemap;
-    [SerializeField] Tilemap obstacleTilemap;
-    [SerializeField] TileBase obstacleTile;
+    [SerializeField] private Tilemap groundTilemap;
+    [SerializeField] private Tilemap obstacleTilemap;
+    [SerializeField] private TileBase obstacleTile;
 
+    [SerializeField] Transform key;
+
+    BoundsInt boundsInt;
+    Dictionary<Vector3Int, PathNode> pathNodeDictionary = new Dictionary<Vector3Int, PathNode>();
     // Start is called before the first frame update
     void Start()
     {
@@ -25,49 +28,123 @@ public class LevelGrid : MonoBehaviour
             return;
         }
         Instance = this;
-        foreach (Transform enemy in enemiesWorldPositions)
+        boundsInt = groundTilemap.cellBounds;
+        CreatePathNodeDictionary();
+        SetisWalkableGridPosition();
+
+    }
+
+    private void CreatePathNodeDictionary()
+    {
+        for (int x = boundsInt.min.x; x < boundsInt.max.x; x++)
         {
-            Vector3 enemyWroldPosition = enemy.transform.position;
-            Vector3Int enemyGridPosition = grid.WorldToCell(enemyWroldPosition);
-            enemiesGridPositionsList.Add(enemyGridPosition);
+            for (int y = boundsInt.min.y; y < boundsInt.max.y; y++)
+            {
+                Vector3Int gridPosition = new Vector3Int(x, y, 0);
+                if (groundTilemap.HasTile(gridPosition))
+                {
+                    PathNode pathNode = new PathNode(gridPosition);
+                    pathNodeDictionary.Add(gridPosition, pathNode);
+
+                }
+            }
         }
-
     }
 
-    public void AddPosition(Vector3 worldPosition)
+    private void SetisWalkableGridPosition()
     {
-        Vector3Int gridPosition = grid.WorldToCell(worldPosition);
-        enemiesGridPositionsList.Add(gridPosition);
+        foreach (Vector3Int key in pathNodeDictionary.Keys)
+        {
+            if (obstacleTilemap.HasTile(key))
+            {
+                pathNodeDictionary[key].SetIsWalkable(false);
+            }
+        }
     }
 
-    public void RemovePositon(Vector3 worldPosition)
+    public void UpdatePathNodeDictionary(Vector3 previousWorldPosition, Vector3 currentWorldPosition)
     {
-        Vector3Int gridPosition = grid.WorldToCell(worldPosition);
-        enemiesGridPositionsList.Remove(gridPosition);
+        pathNodeDictionary[WorldPositionToGridPosition(previousWorldPosition)].SetIsWalkable(true);
+        pathNodeDictionary[WorldPositionToGridPosition(currentWorldPosition)].SetIsWalkable(false);
+    }
+    public Dictionary<Vector3Int, PathNode> GetPathNodeDictionary()
+    {
+        return pathNodeDictionary;
     }
 
-    public void DeleteEnemy(Transform enemy)
+    public PathNode GetPathNode(Vector3Int gridPosition)
     {
-        enemiesWorldPositions.Remove(enemy);
+        return pathNodeDictionary[gridPosition];
+    }
+
+    public Vector3 GetCellCenterWorld(Vector3Int gridPosition)
+    {
+        return grid.GetCellCenterWorld(gridPosition);
+    }
+
+    public Vector3Int WorldPositionToGridPosition(Vector3 worldPosition)
+    {
+        return grid.WorldToCell(worldPosition);
+    }
+
+    public void AddEnemyPosition(Vector3 enemyWorldPosition, Enemy enemy)
+    {
+        enemiesGridPositionDictionary.Add(WorldPositionToGridPosition(enemyWorldPosition), enemy);
+    }
+
+    public void RemoveEnemyPosition(Vector3 enemyWorldPosition)
+    {
+        enemiesGridPositionDictionary.Remove(WorldPositionToGridPosition(enemyWorldPosition));
     }
 
     public bool IsPositionBlockedByEnemy(Vector3 worldPosition)
     {
-        Vector3Int gridPosition = grid.WorldToCell(worldPosition);
-        if (enemiesGridPositionsList.Contains(gridPosition))
+        return enemiesGridPositionDictionary.ContainsKey(WorldPositionToGridPosition(worldPosition));
+    }
+    
+    public bool IsPositionBlockedByEnemy(Vector3Int gridPosition)
+    {
+        return enemiesGridPositionDictionary.ContainsKey(gridPosition);
+    }
+
+    public Enemy GetEnemyAtPosition(Vector3Int gridPosition)
+    {
+        Enemy enemy = enemiesGridPositionDictionary[gridPosition];
+        return enemy;
+    }
+
+    private bool IsGroundBlockedByKey(Vector3 worldPosition)
+    {
+        if(key != null)
         {
-            return true;
+            if (key.transform.position != worldPosition)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     public bool IsValidGridPosition(Vector3 worldPosition)
     {
         // fukncja konwertuje pozycje na pozycje kafelkowa
-        Vector3Int gridPosition = groundTilemap.WorldToCell(worldPosition);
+        // Gdy mapa sie konczy lub gracz napotka przeszkode w kierunku ktorym chce sie poruszyc fukncja zwaraca falsz
+        if (!groundTilemap.HasTile(WorldPositionToGridPosition(worldPosition)) || obstacleTilemap.HasTile(WorldPositionToGridPosition(worldPosition)))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    public bool IsValidGridPosition(Vector3Int gridPosition)
+    {
+        // fukncja konwertuje pozycje na pozycje kafelkowa
         // Gdy mapa sie konczy lub gracz napotka przeszkode w kierunku ktorym chce sie poruszyc fukncja zwaraca falsz
         if (!groundTilemap.HasTile(gridPosition) || obstacleTilemap.HasTile(gridPosition))
         {
@@ -79,14 +156,19 @@ public class LevelGrid : MonoBehaviour
         }
     }
 
+    public bool IsGroundAtGridPosition(Vector3Int gridPosition)
+    {
+        return groundTilemap.HasTile(gridPosition);
+    }
+
     public bool IsValidGridPositionToPush(Vector3 worldPosition, Vector3 behindWorldPosition)
     {
-        // fukncja konwertuje pozycje na pozycje kafelkowa
-        Vector3Int gridPosition = obstacleTilemap.WorldToCell(worldPosition);
-        Vector3Int behindGridPosition = obstacleTilemap.WorldToCell(behindWorldPosition);
         
         // Gdy w kierunku w ktorym chce poruszyc sie gracz napotka przeszkode i nie znjaduje sie za nia inny obiekt oraz mapa nie konczy sie za przeszkoda fukncja zwraca prawde
-        if (obstacleTilemap.HasTile(gridPosition) && !obstacleTilemap.HasTile(behindGridPosition) && groundTilemap.HasTile(behindGridPosition))
+        if (obstacleTilemap.HasTile(WorldPositionToGridPosition(worldPosition)) 
+            && !obstacleTilemap.HasTile(WorldPositionToGridPosition(behindWorldPosition)) 
+            && groundTilemap.HasTile(WorldPositionToGridPosition(behindWorldPosition))
+            && !IsGroundBlockedByKey(behindWorldPosition))
         {
             return true;
         }
@@ -98,10 +180,8 @@ public class LevelGrid : MonoBehaviour
 
     public void ChangeObstacleGridPosition(Vector3 worldPosition, Vector3 behindWorldPosition)
     {
-        Vector3Int gridPosition = obstacleTilemap.WorldToCell(worldPosition);
-        Vector3Int behindGridPosition = obstacleTilemap.WorldToCell(behindWorldPosition);
 
-        obstacleTilemap.SetTile(behindGridPosition, obstacleTile);
-        obstacleTilemap.SetTile(gridPosition, null);
+        obstacleTilemap.SetTile(WorldPositionToGridPosition(behindWorldPosition), obstacleTile);
+        obstacleTilemap.SetTile(WorldPositionToGridPosition(worldPosition), null);
     }
 }
