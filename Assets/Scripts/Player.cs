@@ -87,7 +87,11 @@ public class Player : MonoBehaviour
     {
         playerMovement.DisablePlayerMovment();
         // po odczekaniu danego okresu obiekt gracza zostaje zniszczony
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         Destroy(gameObject);
+    }
+    public bool isPositionBloeckedByPlayer(Vector3 worldPosition)
+    {
+        return transform.position == worldPosition;
     }
 }

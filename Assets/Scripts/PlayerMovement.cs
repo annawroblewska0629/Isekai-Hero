@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
     {
         PlayerActionSystem.Instance.OnActiveActionChanged += PlayerActionSystem_OnActiveActionChanged;
         PlayerActionSystem.Instance.OnActiveActionDeactivation += PlayerActionSystem_OnActiveActionDeactivation;
-        
+       // LevelGrid.Instance.SetIsNotWalkablePathNode(transform.position);
     }
 
     private void Update()
@@ -48,6 +48,7 @@ public class PlayerMovement : MonoBehaviour
             && LevelGrid.Instance.IsValidGridPosition(targetWorldPosition) 
             && !LevelGrid.Instance.IsPositionBlockedByEnemy(targetWorldPosition))
         {
+          //  LevelGrid.Instance.UpdatePathNodeDictionary(transform.position,targetWorldPosition);
             transform.Translate(directionVector3);
             movementLimit--;
             TurnSystem.Instance.StartEnemyTurn();

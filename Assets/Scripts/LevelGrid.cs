@@ -30,7 +30,7 @@ public class LevelGrid : MonoBehaviour
         Instance = this;
         boundsInt = groundTilemap.cellBounds;
         CreatePathNodeDictionary();
-        SetisWalkableGridPosition();
+        CheckIsWalkableGridPosition();
 
     }
 
@@ -51,15 +51,20 @@ public class LevelGrid : MonoBehaviour
         }
     }
 
-    private void SetisWalkableGridPosition()
+    private void CheckIsWalkableGridPosition()
     {
         foreach (Vector3Int key in pathNodeDictionary.Keys)
         {
-            if (obstacleTilemap.HasTile(key))
+            if (obstacleTilemap.HasTile(key) || IsPositionBlockedByEnemy(key))
             {
                 pathNodeDictionary[key].SetIsWalkable(false);
             }
         }
+    }
+
+    public void SetIsWalkablePathNode(Vector3 worldPosition, bool value)
+    {
+        pathNodeDictionary[WorldPositionToGridPosition(worldPosition)].SetIsWalkable(value);
     }
 
     public void UpdatePathNodeDictionary(Vector3 previousWorldPosition, Vector3 currentWorldPosition)
@@ -97,6 +102,12 @@ public class LevelGrid : MonoBehaviour
         enemiesGridPositionDictionary.Remove(WorldPositionToGridPosition(enemyWorldPosition));
     }
 
+    public void EnemyChangingPosition(Vector3 previousWorldPosition, Vector3 newWorldPosition, Enemy enemy)
+    {
+        RemoveEnemyPosition(previousWorldPosition);
+        AddEnemyPosition(newWorldPosition, enemy);
+    }
+
     public bool IsPositionBlockedByEnemy(Vector3 worldPosition)
     {
         return enemiesGridPositionDictionary.ContainsKey(WorldPositionToGridPosition(worldPosition));
@@ -112,6 +123,7 @@ public class LevelGrid : MonoBehaviour
         Enemy enemy = enemiesGridPositionDictionary[gridPosition];
         return enemy;
     }
+
 
     private bool IsGroundBlockedByKey(Vector3 worldPosition)
     {

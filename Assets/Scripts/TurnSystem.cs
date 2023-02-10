@@ -6,7 +6,7 @@ using UnityEngine;
 public class TurnSystem : MonoBehaviour
 {
     private bool isPlayerTurn = true;
-    public event EventHandler OnEnemyTurnStarted;
+   // public event EventHandler OnEnemyTurnStarted;
     public static TurnSystem Instance { get; private set; }  
    
     private void Awake()
@@ -23,7 +23,7 @@ public class TurnSystem : MonoBehaviour
     {
         isPlayerTurn = false;
         Debug.Log("EnemyTurn");
-        OnEnemyTurnStarted?.Invoke(this, EventArgs.Empty);
+       // OnEnemyTurnStarted?.Invoke(this, EventArgs.Empty);
   
     }
     public void StartPlayerTurn()

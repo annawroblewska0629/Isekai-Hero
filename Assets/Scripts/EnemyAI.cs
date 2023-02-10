@@ -5,27 +5,35 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
+
+    //private int currentEnemyIndex = 0;
     // Start is called before the first frame update
     void Start()
     {
-        TurnSystem.Instance.OnEnemyTurnStarted += TurnSystem_OnEnemyTurnStarted;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
+        if (!TurnSystem.Instance.IsPlayerTurn())
+        {
 
-    private IEnumerator EnemyTurn()
-    {
-        // po odczekaniu danego okresu obiekt gracza zostaje zniszczony
-        yield return new WaitForSeconds(2);
+            StartCoroutine(EnemyTakeTurn());
+
+
+        }
         TurnSystem.Instance.StartPlayerTurn();
     }
 
-    public void TurnSystem_OnEnemyTurnStarted(object sender, EventArgs e)
+    private IEnumerator EnemyTakeTurn()
     {
-        StartCoroutine(EnemyTurn());
+        yield return new WaitForSecondsRealtime(0.5f);
+        foreach (Enemy enemy in EnemyManager.Instance.GetEnemyList())
+        {
+            enemy.EnemyTakeAction();
+            //currentEnemyIndex++;
+        }
     }
+
 }
