@@ -60,7 +60,14 @@ public class FreezeAction : Action
 
     public override void TakeAction(Vector3Int actionCastPosition)
     {
-        throw new System.NotImplementedException();
+        foreach (Vector3Int gridPosition in ActionEffectRangePositionList(actionCastPosition))
+        {
+            if (LevelGrid.Instance.IsPositionBlockedByEnemy(gridPosition))
+            {
+                Enemy enemy = LevelGrid.Instance.GetEnemyAtPosition(gridPosition);
+                enemy.SetIsFreezed();
+            }
+        }
     }
 
     public override int GetActionPointsCost()

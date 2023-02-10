@@ -14,7 +14,9 @@ public class Enemy : MonoBehaviour
     Vector3 targetWorldPosition;
     private int currentPositionIndex = 1;
     [SerializeField] Player player;
-   // private bool isAtionComplete = false;
+    private bool isFreezed = false;
+    private int turnBeingFreezed = 0;
+    private int turnBeingOnSand = 0;
     // Start is called before the first frame update
 
     private void Awake()
@@ -24,6 +26,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         LevelGrid.Instance.AddEnemyPosition(transform.position, this);
+        LevelGrid.Instance.SetIsWalkablePathNode(transform.position, false);
         healthSystem.OnDead += HealthSystem_OnDead;
         targetWorldPosition = firstTargetWorldPosition;
         ListOfPositions(targetWorldPosition);
@@ -52,8 +55,8 @@ public class Enemy : MonoBehaviour
      
         if (currentPositionIndex < targetsWorldPositionList.Count)
         {
-                LevelGrid.Instance.EnemyChangingPosition(transform.position, currentTargetWorldPosition, this);
-                LevelGrid.Instance.UpdatePathNodeDictionary(transform.position, currentTargetWorldPosition);
+                LevelGrid.Instance.UpdatePathNodeDictionary(transform.position, currentTargetWorldPosition);    
+                 LevelGrid.Instance.EnemyChangingPosition(transform.position, currentTargetWorldPosition, this);
                 transform.position = currentTargetWorldPosition;     
                  ++currentPositionIndex;
                 if (EnemyCanAttack())
@@ -138,26 +141,56 @@ public class Enemy : MonoBehaviour
     public void EnemyTakeAction()
     {
 
-            if (EnemyCanAttack())
+        if (!isFreezed)
+        {
+            if (!LevelGrid.Instance.isSandAtGridPosition(transform.position) || turnBeingOnSand == 1)
             {
-                Attack();
-            }
-            else if(!LevelGrid.Instance.IsPositionBlockedByEnemy(targetsWorldPositionList[currentPositionIndex])
-                && LevelGrid.Instance.IsValidGridPosition(targetsWorldPositionList[currentPositionIndex])
-               && !player.isPositionBloeckedByPlayer(targetsWorldPositionList[currentPositionIndex]))
+                turnBeingOnSand = 0;
+                if (EnemyCanAttack())
+                {
+                    Attack();
+                }
+                else if (!LevelGrid.Instance.IsPositionBlockedByEnemy(targetsWorldPositionList[currentPositionIndex])
+                    && LevelGrid.Instance.IsValidGridPosition(targetsWorldPositionList[currentPositionIndex])
+                   && !player.isPositionBloeckedByPlayer(targetsWorldPositionList[currentPositionIndex]))
                 {
 
                     Move();
-                
+
                 }
-            else
+                else
                 {
                     ResetPath();
                     Move();
                 }
-
+            }
+            else
+            {
+                turnBeingOnSand++;
+            }
+        }
+        else
+        {
+            EnemyBeingFreezed();
+        }
+     
             ResetTargetPosition();
 
+    }
+
+    public void SetIsFreezed()
+    {
+        isFreezed = true;
+    }
+
+    private void EnemyBeingFreezed()
+    {
+        turnBeingFreezed++;
+        if (turnBeingFreezed == 2)
+        {
+            isFreezed = false;
+            turnBeingFreezed = 0;
+        }
     }
 
 }

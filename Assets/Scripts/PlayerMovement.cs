@@ -48,9 +48,10 @@ public class PlayerMovement : MonoBehaviour
             && LevelGrid.Instance.IsValidGridPosition(targetWorldPosition) 
             && !LevelGrid.Instance.IsPositionBlockedByEnemy(targetWorldPosition))
         {
-          //  LevelGrid.Instance.UpdatePathNodeDictionary(transform.position,targetWorldPosition);
+            //  LevelGrid.Instance.UpdatePathNodeDictionary(transform.position,targetWorldPosition);
+            UpdateMovementLimit();
             transform.Translate(directionVector3);
-            movementLimit--;
+           // movementLimit--;
             TurnSystem.Instance.StartEnemyTurn();
         }
         // do funkcji CanMove zostaje przekazana odczytana wartosc, gdy fukncja zwraca prawde to kafelek na danej pozycji zostaje usuniety oraz zostaje utworozny na nowej, limit poruszana zmniejsza sie
@@ -58,6 +59,7 @@ public class PlayerMovement : MonoBehaviour
             && LevelGrid.Instance.IsValidGridPositionToPush(targetWorldPosition, behindTargetWorldPosition)
             && !LevelGrid.Instance.IsPositionBlockedByEnemy(behindTargetWorldPosition))
         {
+            UpdateMovementLimit();
             LevelGrid.Instance.UpdatePathNodeDictionary(targetWorldPosition, behindTargetWorldPosition);
             LevelGrid.Instance.ChangeObstacleGridPosition(targetWorldPosition, behindTargetWorldPosition);
             transform.Translate(directionVector3);
@@ -80,6 +82,18 @@ public class PlayerMovement : MonoBehaviour
     {
         // funkcja zwaraca limit porszania sie
         return movementLimit;
+    }
+
+    private void UpdateMovementLimit()
+    {
+        if (LevelGrid.Instance.isSandAtGridPosition(transform.position))
+        {
+            movementLimit -= 2;
+        }
+        else
+        {
+            movementLimit--;
+        }
     }
 
     public void DisablePlayerMovment()

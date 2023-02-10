@@ -12,9 +12,12 @@ public class LevelGrid : MonoBehaviour
     [Header("Tilemap")]
     [SerializeField] private Tilemap groundTilemap;
     [SerializeField] private Tilemap obstacleTilemap;
+    [SerializeField] private Tilemap sandTilemap;
     [SerializeField] private TileBase obstacleTile;
 
     [SerializeField] Transform key;
+    [SerializeField] int sandCost;
+
 
     BoundsInt boundsInt;
     Dictionary<Vector3Int, PathNode> pathNodeDictionary = new Dictionary<Vector3Int, PathNode>();
@@ -30,7 +33,8 @@ public class LevelGrid : MonoBehaviour
         Instance = this;
         boundsInt = groundTilemap.cellBounds;
         CreatePathNodeDictionary();
-        CheckIsWalkableGridPosition();
+        CheckIsWalkablePathNode();
+        SetAdditionalCostPathNode();
 
     }
 
@@ -51,13 +55,24 @@ public class LevelGrid : MonoBehaviour
         }
     }
 
-    private void CheckIsWalkableGridPosition()
+    private void CheckIsWalkablePathNode()
     {
         foreach (Vector3Int key in pathNodeDictionary.Keys)
         {
-            if (obstacleTilemap.HasTile(key) || IsPositionBlockedByEnemy(key))
+            if (obstacleTilemap.HasTile(key))
             {
                 pathNodeDictionary[key].SetIsWalkable(false);
+            }
+        }
+    }
+
+    private void SetAdditionalCostPathNode()
+    {
+        foreach (Vector3Int key in pathNodeDictionary.Keys)
+        {
+            if (sandTilemap.HasTile(key))
+            {
+                pathNodeDictionary[key].SetAdditionalCost(sandCost);
             }
         }
     }
@@ -195,5 +210,10 @@ public class LevelGrid : MonoBehaviour
 
         obstacleTilemap.SetTile(WorldPositionToGridPosition(behindWorldPosition), obstacleTile);
         obstacleTilemap.SetTile(WorldPositionToGridPosition(worldPosition), null);
+    }
+
+    public bool isSandAtGridPosition(Vector3 worldPosition)
+    {
+        return sandTilemap.HasTile(WorldPositionToGridPosition(worldPosition));
     }
 }

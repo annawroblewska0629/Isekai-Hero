@@ -6,22 +6,23 @@ using UnityEngine;
 public class HealthSystem : MonoBehaviour
 {
     public event EventHandler OnDead;
-
+    public event EventHandler OnDamaged;
     [SerializeField] private int healthMax;
-    private int heatlh;
+    private int health;
     // Start is called before the first frame update
     void Awake()
     {
-        heatlh = healthMax;
+        health = healthMax;
     }
     public void Damage(int damage)
     {
-        heatlh -= damage;
-        if(heatlh < 0)
+        health -= damage;
+        if(health < 0)
         {
-            heatlh = 0;
+            health = 0;
         }
-        if(heatlh == 0)
+        OnDamaged?.Invoke(this, EventArgs.Empty);
+        if (health == 0)
         {
             Die();
         }
@@ -33,6 +34,11 @@ public class HealthSystem : MonoBehaviour
     }
     public int GetHalth()
     {
-        return heatlh;
+        return health;
+    }
+
+    public float GetHealthNormalized()
+    {
+        return (float)health / healthMax;
     }
 }
