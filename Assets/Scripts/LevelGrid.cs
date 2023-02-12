@@ -15,9 +15,15 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] private Tilemap sandTilemap;
     [SerializeField] private TileBase obstacleTile;
 
+    [Header("Key")]
     [SerializeField] Transform key;
+
+    [Header("SandCost")]
     [SerializeField] int sandCost;
 
+    [Header("EnemyPoints")]
+    [SerializeField] List<Transform> enemyTransformPointsList;
+    List<Vector3Int> enemyGridPointsList = new List<Vector3Int>();
 
     BoundsInt boundsInt;
     Dictionary<Vector3Int, PathNode> pathNodeDictionary = new Dictionary<Vector3Int, PathNode>();
@@ -35,7 +41,16 @@ public class LevelGrid : MonoBehaviour
         CreatePathNodeDictionary();
         CheckIsWalkablePathNode();
         SetAdditionalCostPathNode();
+        CreateGridPointsList();
 
+    }
+
+    private void CreateGridPointsList()
+    {
+        foreach(Transform transform in enemyTransformPointsList)
+        {
+            enemyGridPointsList.Add(WorldPositionToGridPosition(transform.position));
+        }
     }
 
     private void CreatePathNodeDictionary()
@@ -195,7 +210,8 @@ public class LevelGrid : MonoBehaviour
         if (obstacleTilemap.HasTile(WorldPositionToGridPosition(worldPosition)) 
             && !obstacleTilemap.HasTile(WorldPositionToGridPosition(behindWorldPosition)) 
             && groundTilemap.HasTile(WorldPositionToGridPosition(behindWorldPosition))
-            && !IsGroundBlockedByKey(behindWorldPosition))
+            && !IsGroundBlockedByKey(behindWorldPosition)
+            && !enemyGridPointsList.Contains(WorldPositionToGridPosition(behindWorldPosition)))
         {
             return true;
         }

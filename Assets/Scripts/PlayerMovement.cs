@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
 {
 
     PlayerControls playerControls;
-
+    [SerializeField] CoreGame coreGame;
 
     [Header("MovementLimit")]
     [SerializeField] int movementLimit;
@@ -27,7 +27,25 @@ public class PlayerMovement : MonoBehaviour
     {
         PlayerActionSystem.Instance.OnActiveActionChanged += PlayerActionSystem_OnActiveActionChanged;
         PlayerActionSystem.Instance.OnActiveActionDeactivation += PlayerActionSystem_OnActiveActionDeactivation;
-       // LevelGrid.Instance.SetIsNotWalkablePathNode(transform.position);
+        PauseMenu.Instance.OnGamePaused += PauseMenu_OnGamePaused;
+        PauseMenu.Instance.OnGameResumed += PauseMenu_OnGameResumed;
+        coreGame.OnPlayerEndLevel += CoreGame_OnPlayerEndLevel;
+        // LevelGrid.Instance.SetIsNotWalkablePathNode(transform.position);
+    }
+
+    private void CoreGame_OnPlayerEndLevel(object sender, EventArgs e)
+    {
+        DisablePlayerMovment();
+    }
+
+    private void PauseMenu_OnGameResumed(object sender, EventArgs e)
+    {
+        EnablePlayerMovment();
+    }
+
+    private void PauseMenu_OnGamePaused(object sender, EventArgs e)
+    {
+        DisablePlayerMovment();
     }
 
     private void Update()
@@ -48,10 +66,8 @@ public class PlayerMovement : MonoBehaviour
             && LevelGrid.Instance.IsValidGridPosition(targetWorldPosition) 
             && !LevelGrid.Instance.IsPositionBlockedByEnemy(targetWorldPosition))
         {
-            //  LevelGrid.Instance.UpdatePathNodeDictionary(transform.position,targetWorldPosition);
             UpdateMovementLimit();
             transform.Translate(directionVector3);
-           // movementLimit--;
             TurnSystem.Instance.StartEnemyTurn();
         }
         // do funkcji CanMove zostaje przekazana odczytana wartosc, gdy fukncja zwraca prawde to kafelek na danej pozycji zostaje usuniety oraz zostaje utworozny na nowej, limit poruszana zmniejsza sie
@@ -63,7 +79,6 @@ public class PlayerMovement : MonoBehaviour
             LevelGrid.Instance.UpdatePathNodeDictionary(targetWorldPosition, behindTargetWorldPosition);
             LevelGrid.Instance.ChangeObstacleGridPosition(targetWorldPosition, behindTargetWorldPosition);
             transform.Translate(directionVector3);
-            movementLimit--;
             TurnSystem.Instance.StartEnemyTurn();
         }
 

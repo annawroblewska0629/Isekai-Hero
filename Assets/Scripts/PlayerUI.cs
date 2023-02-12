@@ -25,11 +25,11 @@ public class PlayerUI : MonoBehaviour
 
     private void UpdateActionPoints()
     {
-        actionPoints.text = "AP: " + player.GetActionPoints().ToString();
+        actionPoints.text = player.GetActionPoints().ToString();
     }
 
     private void UpdateMovementLimit()
     {
-        movementLimits.text = "ML: " + playerMovement.GetMovementScore().ToString();
+        movementLimits.text = playerMovement.GetMovementScore().ToString();
     }
 }

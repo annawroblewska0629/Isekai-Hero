@@ -8,15 +8,16 @@ public class Enemy : MonoBehaviour
     HealthSystem healthSystem;
     public static event EventHandler OnEnemySpawned;
     public static event EventHandler OnEnemyDead;
-    List<Vector3> targetsWorldPositionList = new List<Vector3>();
-    [SerializeField] Vector3 firstTargetWorldPosition;
-    [SerializeField] Vector3 secondTargetWorldPosition;
+    List<Vector3Int> pathGridPositionList = new List<Vector3Int>();
+    [SerializeField] Transform firstTargetWorldPosition;
+    [SerializeField] Transform secondTargetWorldPosition;
     Vector3 targetWorldPosition;
     private int currentPositionIndex = 1;
     [SerializeField] Player player;
     private bool isFreezed = false;
     private int turnBeingFreezed = 0;
     private int turnBeingOnSand = 0;
+    private bool isCahsing = false;
     // Start is called before the first frame update
 
     private void Awake()
@@ -28,7 +29,7 @@ public class Enemy : MonoBehaviour
         LevelGrid.Instance.AddEnemyPosition(transform.position, this);
         LevelGrid.Instance.SetIsWalkablePathNode(transform.position, false);
         healthSystem.OnDead += HealthSystem_OnDead;
-        targetWorldPosition = firstTargetWorldPosition;
+        targetWorldPosition = firstTargetWorldPosition.position;
         ListOfPositions(targetWorldPosition);
         OnEnemySpawned?.Invoke(this, EventArgs.Empty);
         //  Debug.Log(LevelGrid.Instance.WorldPositionToGridPosition(transform.position) + " pozycja enemy ");
@@ -51,15 +52,15 @@ public class Enemy : MonoBehaviour
 
    private void Move()
     {
-        Vector3 currentTargetWorldPosition = targetsWorldPositionList[currentPositionIndex];
+        Vector3 currentTargetWorldPosition = LevelGrid.Instance.GetCellCenterWorld(pathGridPositionList[currentPositionIndex]);
      
-        if (currentPositionIndex < targetsWorldPositionList.Count)
+        if (currentPositionIndex < pathGridPositionList.Count)
         {
                 LevelGrid.Instance.UpdatePathNodeDictionary(transform.position, currentTargetWorldPosition);    
-                 LevelGrid.Instance.EnemyChangingPosition(transform.position, currentTargetWorldPosition, this);
+                LevelGrid.Instance.EnemyChangingPosition(transform.position, currentTargetWorldPosition, this);
                 transform.position = currentTargetWorldPosition;     
                  ++currentPositionIndex;
-                if (EnemyCanAttack())
+                if (EnemyCanAttack() && !LevelGrid.Instance.isSandAtGridPosition(transform.position))
                 {
                     Attack();
                 }
@@ -71,33 +72,32 @@ public class Enemy : MonoBehaviour
 
     private void ListOfPositions(Vector3 targetWorldPosition)
     {
-        List<Vector3Int> pathGridPositionList = Pathfinding.Instance.FindPath(LevelGrid.Instance.WorldPositionToGridPosition(transform.position), LevelGrid.Instance.WorldPositionToGridPosition(targetWorldPosition));
-        
-
-        foreach (Vector3Int pathGridPosition in pathGridPositionList)
+        if (Pathfinding.Instance.HasPath(LevelGrid.Instance.WorldPositionToGridPosition(transform.position), LevelGrid.Instance.WorldPositionToGridPosition(targetWorldPosition)))
         {
-            targetsWorldPositionList.Add(LevelGrid.Instance.GetCellCenterWorld(pathGridPosition));
-        }
+            
+            pathGridPositionList = Pathfinding.Instance.FindPath(LevelGrid.Instance.WorldPositionToGridPosition(transform.position), LevelGrid.Instance.WorldPositionToGridPosition(targetWorldPosition));
 
+        }
+  
     }
 
     private void ResetPath() 
     {
-        targetsWorldPositionList.Clear();
+        pathGridPositionList.Clear();
         currentPositionIndex = 1;
         ListOfPositions(targetWorldPosition);
     }
 
     private void ResetTargetPosition()
     {
-        if (transform.position == firstTargetWorldPosition)
+        if (LevelGrid.Instance.WorldPositionToGridPosition(transform.position) == LevelGrid.Instance.WorldPositionToGridPosition(firstTargetWorldPosition.position))
         {
-            targetWorldPosition = secondTargetWorldPosition;
+            targetWorldPosition = secondTargetWorldPosition.position;
             ResetPath();
         }
-        if (transform.position == secondTargetWorldPosition)
+        if (LevelGrid.Instance.WorldPositionToGridPosition(transform.position) == LevelGrid.Instance.WorldPositionToGridPosition(secondTargetWorldPosition.position))
         {
-            targetWorldPosition = firstTargetWorldPosition;
+            targetWorldPosition = firstTargetWorldPosition.position;
 
             ResetPath();
         }
@@ -143,16 +143,26 @@ public class Enemy : MonoBehaviour
 
         if (!isFreezed)
         {
-            if (!LevelGrid.Instance.isSandAtGridPosition(transform.position) || turnBeingOnSand == 1)
+            if (EnemyCanAttack() && !LevelGrid.Instance.isSandAtGridPosition(transform.position))
+            {
+                Attack();
+            }
+            else if (isCahsing)
+            {
+                Chase();
+            }
+            else if(!Pathfinding.Instance.HasPath(LevelGrid.Instance.WorldPositionToGridPosition(transform.position), LevelGrid.Instance.WorldPositionToGridPosition(targetWorldPosition)))
+            {
+                StartChasing();
+                
+            }
+            else if (!LevelGrid.Instance.isSandAtGridPosition(transform.position) || turnBeingOnSand == 1)
             {
                 turnBeingOnSand = 0;
-                if (EnemyCanAttack())
-                {
-                    Attack();
-                }
-                else if (!LevelGrid.Instance.IsPositionBlockedByEnemy(targetsWorldPositionList[currentPositionIndex])
-                    && LevelGrid.Instance.IsValidGridPosition(targetsWorldPositionList[currentPositionIndex])
-                   && !player.isPositionBloeckedByPlayer(targetsWorldPositionList[currentPositionIndex]))
+
+                if (!LevelGrid.Instance.IsPositionBlockedByEnemy(pathGridPositionList[currentPositionIndex])
+                    && LevelGrid.Instance.IsValidGridPosition(pathGridPositionList[currentPositionIndex])
+                   && !player.isPositionBloeckedByPlayer(pathGridPositionList[currentPositionIndex]))
                 {
 
                     Move();
@@ -191,6 +201,20 @@ public class Enemy : MonoBehaviour
             isFreezed = false;
             turnBeingFreezed = 0;
         }
+    }
+
+    private void Chase()
+    {
+        targetWorldPosition = player.transform.position;
+        ResetPath();
+        Move();
+    }
+
+    private void StartChasing()
+    {
+        targetWorldPosition = player.transform.position;
+        isCahsing = true;
+        ResetPath();
     }
 
 }

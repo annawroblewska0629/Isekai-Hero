@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class Player : MonoBehaviour
     [SerializeField] private int actionPointsMax;
     private int currentActionPoints;
     private Action[] playerActionArray;
+    public event EventHandler OnPlayerDead;
 
     // Start is called before the first frame update
     void Awake()
@@ -23,10 +25,11 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Start()
     {
-        healthSystem.OnDead += HealthSystem_OnDead;
+        healthSystem.OnDead += HealthSystem_OnDead; 
         playerMovement.OnMovementLimitReachedZero += PlayerMovement_OnMovementLimitReachedZero;
         Debug.Log(LevelGrid.Instance.WorldPositionToGridPosition(transform.position));
     }
+
 
     private void PlayerMovement_OnMovementLimitReachedZero(object sender, EventArgs e)
     {
@@ -89,9 +92,10 @@ public class Player : MonoBehaviour
         // po odczekaniu danego okresu obiekt gracza zostaje zniszczony
         yield return new WaitForSeconds(1);
         Destroy(gameObject);
+        OnPlayerDead?.Invoke(this, EventArgs.Empty);
     }
     public bool isPositionBloeckedByPlayer(Vector3 worldPosition)
     {
-        return transform.position == worldPosition;
+        return LevelGrid.Instance.WorldPositionToGridPosition(transform.position) == LevelGrid.Instance.WorldPositionToGridPosition(worldPosition);
     }
 }
