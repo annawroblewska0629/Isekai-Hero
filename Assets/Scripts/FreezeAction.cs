@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FreezeAction : Action
 {
+    [SerializeField] Animator playerAnimator;
 
     [Header("ActionCastRange")]
     [SerializeField] int maxFrezzeCastRangeX;
@@ -68,6 +69,7 @@ public class FreezeAction : Action
                 enemy.SetIsFreezed();
             }
         }
+        playerAnimator.SetTrigger("isCastingSpell");
     }
 
     public override int GetActionPointsCost()

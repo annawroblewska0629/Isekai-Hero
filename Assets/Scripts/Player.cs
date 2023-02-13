@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     private int currentActionPoints;
     private Action[] playerActionArray;
     public event EventHandler OnPlayerDead;
+    [SerializeField] Animator playerAnimator;
 
     // Start is called before the first frame update
     void Awake()
@@ -90,8 +91,9 @@ public class Player : MonoBehaviour
     {
         playerMovement.DisablePlayerMovment();
         // po odczekaniu danego okresu obiekt gracza zostaje zniszczony
+        yield return new WaitForSeconds(0.5f);
+        playerAnimator.SetTrigger("isDead");
         yield return new WaitForSeconds(1);
-        Destroy(gameObject);
         OnPlayerDead?.Invoke(this, EventArgs.Empty);
     }
     public bool isPositionBloeckedByPlayer(Vector3 worldPosition)

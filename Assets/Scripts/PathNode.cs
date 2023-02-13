@@ -8,7 +8,7 @@ public class PathNode
     private int gCost;
     private int hCost;
     private int fCost;
-    private int additionalCost = 0;
+    private int exitCost = 1;
     private bool isWalable = true;
     private PathNode previousPathNode;
 
@@ -17,19 +17,19 @@ public class PathNode
         this.gridPosition = gridPosition;
     }
 
-    public void SetAdditionalCost(int additionalCost)
+    public void SetExitCost(int exitCost)
     {
-        this.additionalCost = additionalCost;
+        this.exitCost = exitCost;
     }
 
-    public int GetAdditionalCost()
+    public int GetExitCost()
     {
-        return additionalCost;
+        return exitCost;
     }
 
     public void CalculateFCost()
     {
-        fCost = gCost + hCost + additionalCost;
+        fCost = gCost + hCost + exitCost;
     }
 
     public void SetHCost(int hCost)

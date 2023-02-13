@@ -1,5 +1,61 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1064330906
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1064330907}
+  - component: {fileID: 1064330908}
+  m_Layer: 0
+  m_Name: DialogSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1064330907
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064330906}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3780560079442481755}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1064330908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064330906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5848bf80e7957864b9caaabb642b6dc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coreGame: {fileID: 3780560079533798220}
+  dialogSO: {fileID: 11400000, guid: d4a4befe75c1cc14082fd21f967e4e90, type: 2}
+  dialogUI: {fileID: 0}
+  girl: {fileID: 0}
+  endButton: {fileID: 0}
+  playerUI: {fileID: 0}
+  playerCards: {fileID: 0}
+  face: {fileID: 0}
+  questionText: {fileID: 0}
+  answerButtons:
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &1332599275
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,7 +147,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  coreGame: {fileID: 3780560079533798220}
+  nextLevel: Level2
+  levelToUnlock: 2
 --- !u!1 &3780560078899147328
 GameObject:
   m_ObjectHideFlags: 0
@@ -264,6 +321,7 @@ Transform:
   - {fileID: 3780560079555080224}
   - {fileID: 1332599276}
   - {fileID: 1988983389}
+  - {fileID: 1064330907}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -314,6 +372,7 @@ MonoBehaviour:
   key: {fileID: 0}
   exit: {fileID: 0}
   player: {fileID: 0}
+  chestAnimator: {fileID: 0}
 --- !u!1 &3780560079555080227
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,7 +511,7 @@ MonoBehaviour:
   sandTilemap: {fileID: 0}
   obstacleTile: {fileID: 11400000, guid: d767092c1b3ba844bbbb0769342cba50, type: 2}
   key: {fileID: 0}
-  sandCost: 3
+  sandCost: 2
   enemyTransformPointsList:
   - {fileID: 0}
   - {fileID: 0}

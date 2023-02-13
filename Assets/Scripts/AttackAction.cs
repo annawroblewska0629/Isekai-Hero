@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AttackAction : Action
 {
+    [SerializeField] Animator playerAnimator;
 
     [Header("ActionCastRange")]
     [SerializeField] int maxAttackCastRangeX;
@@ -68,9 +69,11 @@ public class AttackAction : Action
             {
                 Enemy enemy = LevelGrid.Instance.GetEnemyAtPosition(gridPosition);
                 enemy.Damage(1);
+                
             }
         }
-        
+        playerAnimator.SetTrigger("isCastingSpell");
+     
     }
 
     public override int GetActionPointsCost()

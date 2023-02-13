@@ -14,6 +14,7 @@ public class DialogSystem : MonoBehaviour
     [SerializeField] GameObject endButton;
     [SerializeField] GameObject playerUI;
     [SerializeField] GameObject playerCards;
+    [SerializeField] GameObject face;
      
     [Header("Question")]
     [SerializeField] TextMeshProUGUI questionText;
@@ -65,16 +66,16 @@ public class DialogSystem : MonoBehaviour
         if (index == dialogSO.GetCorrectAnswerIndex())
         {
             questionText.text = dialogSO.GetGoodReply();
-
+            face.GetComponent<SpriteRenderer>().sprite = dialogSO.GetGoodFaceReaction();
         }
         else
         {
 
             questionText.text = dialogSO.GetBadReply();
-
+            face.GetComponent<SpriteRenderer>().sprite = dialogSO.GetBadFaceReaction();
         }
     }
-
+    
     public void onAnswerSelected(int index)
     {
         DisplayAnswer(index);

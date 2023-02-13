@@ -71,7 +71,7 @@ public class Pathfinding : MonoBehaviour
                 }
 
                 int tentativeGCost =
-                    currentNode.GetGCost() + CalculateDistance(currentNode.GetGridPosition(), neighbourNode.GetGridPosition());
+                    currentNode.GetGCost() + currentNode.GetExitCost();
 
                 if (tentativeGCost < neighbourNode.GetGCost())
                 {

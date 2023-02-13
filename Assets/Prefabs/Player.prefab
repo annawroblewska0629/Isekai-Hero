@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4236860847437281528}
   - component: {fileID: 4236860847437281511}
   - component: {fileID: 4236860847437281510}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49,7 +49,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85ecca4481ca99b43966ebd80825c210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementLimit: 20
+  coreGame: {fileID: 0}
+  movementLimit: 10
 --- !u!114 &4236860847437281529
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,6 +63,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4924b7984e09d5d4babd361b0374b81c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerAnimator: {fileID: 1459454531}
   maxAttackCastRangeX: 2
   maxAttackCastRangeY: 2
   maxAttackEffectRangeY: 3
@@ -78,6 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac6824f5927b9ba4fa59f7e34374a9b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerAnimator: {fileID: 1459454531}
   maxFrezzeCastRangeX: 2
   maxFreezeCastRangeY: 2
   actionColorType: 0
@@ -93,7 +96,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b039bdcf991375b46b057e739f36d26e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionPointsMax: 10
+  actionPointsMax: 100
+  playerAnimator: {fileID: 1459454531}
 --- !u!114 &4236860847437281510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,7 +121,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4236860848715754071}
   - component: {fileID: 4236860848715754070}
-  m_Layer: 0
+  - component: {fileID: 1459454531}
+  m_Layer: 6
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,7 +184,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 9b152a308beda1046b5d6abf192e904d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -191,3 +196,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &1459454531
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4236860848715753896}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c7bf10c6bc6d9b64387bfe7dfb8e70a6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

@@ -40,7 +40,7 @@ public class LevelGrid : MonoBehaviour
         boundsInt = groundTilemap.cellBounds;
         CreatePathNodeDictionary();
         CheckIsWalkablePathNode();
-        SetAdditionalCostPathNode();
+        SetExitCostPathNode();
         CreateGridPointsList();
 
     }
@@ -81,13 +81,13 @@ public class LevelGrid : MonoBehaviour
         }
     }
 
-    private void SetAdditionalCostPathNode()
+    private void SetExitCostPathNode()
     {
         foreach (Vector3Int key in pathNodeDictionary.Keys)
         {
             if (sandTilemap.HasTile(key))
             {
-                pathNodeDictionary[key].SetAdditionalCost(sandCost);
+                pathNodeDictionary[key].SetExitCost(sandCost);
             }
         }
     }
@@ -111,6 +111,7 @@ public class LevelGrid : MonoBehaviour
     {
         return pathNodeDictionary[gridPosition];
     }
+
 
     public Vector3 GetCellCenterWorld(Vector3Int gridPosition)
     {

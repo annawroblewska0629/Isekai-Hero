@@ -8,6 +8,7 @@ public class PauseMenu : MonoBehaviour
 {
     public event EventHandler OnGamePaused;
     public event EventHandler OnGameResumed;
+    public event EventHandler OnGameRestart;
     private bool isGamePaused = false;
     [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject playerUI;
@@ -72,5 +73,11 @@ public class PauseMenu : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void Restart()
+    {
+        OnGameRestart.Invoke(this, EventArgs.Empty);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

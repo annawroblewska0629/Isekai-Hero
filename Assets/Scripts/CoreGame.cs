@@ -9,6 +9,7 @@ public class CoreGame : MonoBehaviour
     [SerializeField] GameObject key;
     [SerializeField] GameObject exit;
     [SerializeField] Transform player;
+    [SerializeField] Animator chestAnimator;
     private bool isChestOpen = false;
     public event EventHandler OnPlayerEndLevel;
 
@@ -56,6 +57,7 @@ public class CoreGame : MonoBehaviour
         if(LevelGrid.Instance.WorldPositionToGridPosition(player.transform.position) == LevelGrid.Instance.WorldPositionToGridPosition(exit.transform.position) && hasKey)
         {
             isChestOpen = true;
+            chestAnimator.SetTrigger("isOpen");
             OnPlayerEndLevel?.Invoke(this, EventArgs.Empty);
         }
     }

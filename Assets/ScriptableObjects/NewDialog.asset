@@ -19,3 +19,5 @@ MonoBehaviour:
   badReply: bad
   goodReply: good
   indexOfRightAnswer: 0
+  goodFaceReaction: {fileID: 5620358702335434007, guid: a2e4558a0cc4d6c4f8c529430f023018, type: 3}
+  badFaceReaction: {fileID: 4126444827967965851, guid: 802c70bcb5e6c0145b55ebcaf7a32415, type: 3}

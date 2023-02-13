@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(menuName = "Dialog", fileName = "NewDialog")]
 public class DialogSO : ScriptableObject
@@ -11,6 +12,8 @@ public class DialogSO : ScriptableObject
     [SerializeField] string badReply = "Enter a bad reply";
     [SerializeField] string goodReply = "Enter a bad reply";
     [SerializeField] int indexOfRightAnswer;
+    [SerializeField] GameObject goodFaceReaction;
+    [SerializeField] GameObject badFaceReaction;
 
     public string GetAnswer(int index)
     {
@@ -36,5 +39,14 @@ public class DialogSO : ScriptableObject
     public string GetGoodReply()
     {
         return goodReply;
+    }
+
+    public Sprite GetGoodFaceReaction()
+    {
+        return goodFaceReaction.GetComponentInChildren<SpriteRenderer>().sprite;
+    }
+    public Sprite GetBadFaceReaction()
+    {
+        return badFaceReaction.GetComponentInChildren<SpriteRenderer>().sprite; 
     }
 }

@@ -2,13 +2,14 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
 
     PlayerControls playerControls;
     [SerializeField] CoreGame coreGame;
+    [SerializeField] GameManager gameManager;
 
     [Header("MovementLimit")]
     [SerializeField] int movementLimit;
@@ -25,12 +26,20 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Start()
     {
+
         PlayerActionSystem.Instance.OnActiveActionChanged += PlayerActionSystem_OnActiveActionChanged;
         PlayerActionSystem.Instance.OnActiveActionDeactivation += PlayerActionSystem_OnActiveActionDeactivation;
         PauseMenu.Instance.OnGamePaused += PauseMenu_OnGamePaused;
         PauseMenu.Instance.OnGameResumed += PauseMenu_OnGameResumed;
+        PauseMenu.Instance.OnGameRestart += GameManager_OnGameRestarted;
         coreGame.OnPlayerEndLevel += CoreGame_OnPlayerEndLevel;
+        gameManager.OnGameRestarted += GameManager_OnGameRestarted;
         // LevelGrid.Instance.SetIsNotWalkablePathNode(transform.position);
+    }
+
+    private void GameManager_OnGameRestarted(object sender, EventArgs e)
+    {
+        playerControls.Player.Move.performed -= Move;
     }
 
     private void CoreGame_OnPlayerEndLevel(object sender, EventArgs e)
@@ -87,7 +96,7 @@ public class PlayerMovement : MonoBehaviour
     private void MovementLimitReachedZero()
     {
         // gdy limit poruszania sie osiagnie zero funkcja zwraca prawde
-        if (movementLimit == 0)
+        if (movementLimit < 0)
         {
             OnMovementLimitReachedZero?.Invoke(this, EventArgs.Empty);
         }

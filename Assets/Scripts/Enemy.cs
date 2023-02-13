@@ -5,9 +5,12 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [SerializeField] Animator enemyAnimator;
     HealthSystem healthSystem;
     public static event EventHandler OnEnemySpawned;
     public static event EventHandler OnEnemyDead;
+    public event EventHandler OnEnemyFreezed;
+    public event EventHandler OnEnemyUnfreezed;
     List<Vector3Int> pathGridPositionList = new List<Vector3Int>();
     [SerializeField] Transform firstTargetWorldPosition;
     [SerializeField] Transform secondTargetWorldPosition;
@@ -40,13 +43,14 @@ public class Enemy : MonoBehaviour
     public void Damage(int damage)
     {
         healthSystem.Damage(damage);
+        enemyAnimator.SetTrigger("isHurt");
     }
 
     private void HealthSystem_OnDead(object sender, EventArgs e)
     {
         LevelGrid.Instance.RemoveEnemyPosition(transform.position);
         LevelGrid.Instance.SetIsWalkablePathNode(transform.position, true);
-        Destroy(gameObject);
+        enemyAnimator.SetTrigger("isDead");
         OnEnemyDead?.Invoke(this, EventArgs.Empty);
     }
 
@@ -134,6 +138,7 @@ public class Enemy : MonoBehaviour
 
     private void Attack()
     {
+        enemyAnimator.SetTrigger("isAttacking");
         player.Damage(1);
     }
 
@@ -157,6 +162,7 @@ public class Enemy : MonoBehaviour
                 
             }
             else if (!LevelGrid.Instance.isSandAtGridPosition(transform.position) || turnBeingOnSand == 1)
+           
             {
                 turnBeingOnSand = 0;
 
@@ -191,6 +197,7 @@ public class Enemy : MonoBehaviour
     public void SetIsFreezed()
     {
         isFreezed = true;
+        OnEnemyFreezed?.Invoke(this, EventArgs.Empty);
     }
 
     private void EnemyBeingFreezed()
@@ -199,6 +206,7 @@ public class Enemy : MonoBehaviour
         if (turnBeingFreezed == 2)
         {
             isFreezed = false;
+            OnEnemyUnfreezed?.Invoke(this, EventArgs.Empty);
             turnBeingFreezed = 0;
         }
     }
