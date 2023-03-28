@@ -5,6 +5,8 @@ using UnityEngine;
 public class FreezeAction : Action
 {
     [SerializeField] Animator playerAnimator;
+    [SerializeField] string actionName = "Freeze";
+    [SerializeField] int actionCost = 2;
 
     [Header("ActionCastRange")]
     [SerializeField] int maxFrezzeCastRangeX;
@@ -25,7 +27,7 @@ public class FreezeAction : Action
 
     public override string GetActionName()
     {
-        return "Freeze";
+        return actionName;
     }
 
     public override List<Vector3Int> ActionCastRangePositionList()
@@ -74,7 +76,7 @@ public class FreezeAction : Action
 
     public override int GetActionPointsCost()
     {
-        return 4;
+        return actionCost;
     }
 
     public override List<Vector3Int> ActionEffectRangePositionList(Vector3Int gridPosition)

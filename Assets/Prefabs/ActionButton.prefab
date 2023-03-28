@@ -139,6 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   button: {fileID: 2859896063063710041}
   actionNameText: {fileID: 2859896064387468699}
+  costActionText: {fileID: 2859896063114008532}
   activeActionButtonVisual: {fileID: 7580946912948309038}
 --- !u!1 &2859896063114008530
 GameObject:
@@ -476,7 +477,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 2013979153, guid: 71ad172f81917dc4c88b385499ba85c4, type: 3}
+  m_Sprite: {fileID: 966156953, guid: 71ad172f81917dc4c88b385499ba85c4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b33a28845ec45c489a27217d506a02c, type: 3}
   m_Name: NewDialog
   m_EditorClassIdentifier: 
-  question: hello
+  question: Thanks for saving me
   answers:
-  - hello
-  - goodbay
+  - You don't have to thanks me.
+  - No problem, it was too easy.
   badReply: bad
   goodReply: good
   indexOfRightAnswer: 0

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-
+    private bool enemyAllActionsCompleted = false;
     //private int currentEnemyIndex = 0;
     // Start is called before the first frame update
     void Start()
@@ -18,22 +18,26 @@ public class EnemyAI : MonoBehaviour
     {
         if (!TurnSystem.Instance.IsPlayerTurn())
         {
-
-            StartCoroutine(EnemyTakeTurn());
-
-
+            if (!enemyAllActionsCompleted)
+            {
+                EnemyTakeTurn();
+            }
+            else
+            {
+                TurnSystem.Instance.StartPlayerTurn();
+                enemyAllActionsCompleted = false;
+            }
         }
-        TurnSystem.Instance.StartPlayerTurn();
     }
 
-    private IEnumerator EnemyTakeTurn()
+    private void EnemyTakeTurn()
     {
-        yield return new WaitForSecondsRealtime(0.5f);
         foreach (Enemy enemy in EnemyManager.Instance.GetEnemyList())
         {
             enemy.EnemyTakeAction();
             //currentEnemyIndex++;
         }
+        enemyAllActionsCompleted = true;
     }
 
 }

@@ -62,7 +62,6 @@ public class DialogSystem : MonoBehaviour
 
     void DisplayAnswer(int index)
     {
-
         if (index == dialogSO.GetCorrectAnswerIndex())
         {
             questionText.text = dialogSO.GetGoodReply();
@@ -70,7 +69,6 @@ public class DialogSystem : MonoBehaviour
         }
         else
         {
-
             questionText.text = dialogSO.GetBadReply();
             face.GetComponent<SpriteRenderer>().sprite = dialogSO.GetBadFaceReaction();
         }

@@ -90,12 +90,12 @@ public class Player : MonoBehaviour
     private IEnumerator Death()
     {
         playerMovement.DisablePlayerMovment();
-        // po odczekaniu danego okresu obiekt gracza zostaje zniszczony
         yield return new WaitForSeconds(0.5f);
         playerAnimator.SetTrigger("isDead");
         yield return new WaitForSeconds(1);
         OnPlayerDead?.Invoke(this, EventArgs.Empty);
     }
+
     public bool isPositionBloeckedByPlayer(Vector3 worldPosition)
     {
         return LevelGrid.Instance.WorldPositionToGridPosition(transform.position) == LevelGrid.Instance.WorldPositionToGridPosition(worldPosition);

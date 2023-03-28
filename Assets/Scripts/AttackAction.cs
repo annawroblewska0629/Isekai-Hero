@@ -5,11 +5,14 @@ using UnityEngine;
 public class AttackAction : Action
 {
     [SerializeField] Animator playerAnimator;
+    [SerializeField] string actionName = "Attack";
+    [SerializeField] int actionCost = 5;
+    [SerializeField] int damage = 1;
 
     [Header("ActionCastRange")]
     [SerializeField] int maxAttackCastRangeX;
     [SerializeField] int maxAttackCastRangeY;
-    [SerializeField] int maxAttackEffectRangeY;
+    [SerializeField] int maxAttackEffectRangeX;
     [SerializeField]ActionGridVisual.ColorType actionColorType; 
     
     // Start is called before the first frame update
@@ -26,7 +29,7 @@ public class AttackAction : Action
 
     public override string GetActionName()
     {
-        return "Attack";
+        return actionName;
     }
 
     public override List<Vector3Int> ActionCastRangePositionList()
@@ -68,17 +71,16 @@ public class AttackAction : Action
             if (LevelGrid.Instance.IsPositionBlockedByEnemy(gridPosition))
             {
                 Enemy enemy = LevelGrid.Instance.GetEnemyAtPosition(gridPosition);
-                enemy.Damage(1);
+                enemy.Damage(damage);
                 
             }
         }
         playerAnimator.SetTrigger("isCastingSpell");
-     
     }
 
     public override int GetActionPointsCost()
     {
-        return 5;
+        return actionCost;
     }
 
     public override List<Vector3Int> ActionEffectRangePositionList(Vector3Int gridPosition)
@@ -86,10 +88,10 @@ public class AttackAction : Action
         List<Vector3Int> atackEffectGridPositionList = new List<Vector3Int>();
         if (isValidActionCastPosition(gridPosition))
         {
-            for (int y = 0; y <= maxAttackEffectRangeY; y++)
+            for (int x = 0; x <= maxAttackEffectRangeX; x++)
             {
 
-                Vector3Int offsetGridPosition = new Vector3Int(0, y, 0);
+                Vector3Int offsetGridPosition = new Vector3Int(-x, 0, 0);
                 Vector3Int testGridPosition = gridPosition + offsetGridPosition;
 
                 if (!LevelGrid.Instance.IsGroundAtGridPosition(testGridPosition))

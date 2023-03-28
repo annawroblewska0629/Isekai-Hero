@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
 
     private void Player_OnPlayerDead(object sender, EventArgs e)
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        ResetCurrentLevel();
     }
 
     public void NextLevel(string nextLevelName)
@@ -37,5 +37,10 @@ public class GameManager : MonoBehaviour
         Debug.Log("nowy level");
         PlayerPrefs.SetInt("activeLevel", levelToUnlock);
         SceneManager.LoadScene(nextLevelName);
+    }
+
+    private void ResetCurrentLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

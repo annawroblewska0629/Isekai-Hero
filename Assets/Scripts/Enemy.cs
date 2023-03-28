@@ -68,6 +68,10 @@ public class Enemy : MonoBehaviour
                 {
                     Attack();
                 }
+                else if (player.isPositionBloeckedByPlayer(transform.position))
+                {
+                Attack();
+                 }
 
         }
 

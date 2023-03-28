@@ -14,6 +14,7 @@ public class HealthSystem : MonoBehaviour
     {
         health = healthMax;
     }
+
     public void Damage(int damage)
     {
         health -= damage;
@@ -24,7 +25,7 @@ public class HealthSystem : MonoBehaviour
         OnDamaged?.Invoke(this, EventArgs.Empty);
         if (health == 0)
         {
-            Die();
+            OnDead?.Invoke(this, EventArgs.Empty);
         }
     }
 

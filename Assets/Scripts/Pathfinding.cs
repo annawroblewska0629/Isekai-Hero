@@ -19,81 +19,108 @@ public class Pathfinding : MonoBehaviour
     }
 
 
-    public List<Vector3Int> FindPath(Vector3Int startGridPosition, Vector3Int endGridPosition/* out int pathLength*/)
+    public List<Vector3Int> FindPath(Vector3Int startGridPosition, Vector3Int endGridPosition)
     {
         Dictionary<Vector3Int, PathNode> pathNodeDictionary = LevelGrid.Instance.GetPathNodeDictionary();
+        // pobieranie pocz¹tkowej kolekcji PathNode
         List<PathNode> openList = new List<PathNode>();
         List<PathNode> closedList = new List<PathNode>();
 
         PathNode startNode = pathNodeDictionary[startGridPosition];
+        // przypisane wartoœci do pocz¹tkowego PathNode
         PathNode endNode = pathNodeDictionary[endGridPosition];
+        // przypisane wartoœci do koñcowego PathNode
         openList.Add(startNode);
 
-        foreach(PathNode pathNode in pathNodeDictionary.Values)
-        {
-            /*pathNode.SetGCost(int.MaxValue);
-            pathNode.SetHCost(0);
-            pathNode.CalculateFCost();
-            pathNode.ResetPreviousPathNode();
-            */
-            pathNode.ResetPathNode();
-        }
-        startNode.SetGCost(0);
-        startNode.SetHCost(CalculateDistance(startGridPosition, endGridPosition));
-        startNode.CalculateFCost();
+        RestartPathNodeValueInDictionary(pathNodeDictionary);
+        // resetowanie wartoœæi PathNode 
+
+        SetValueForStartNode(startNode, startGridPosition, endGridPosition);
+        // Obliczanie Wartoœci startNode
 
         while (openList.Count > 0)
+            // sprawdzanie czy openList nie jest pusta
         {
             PathNode currentNode = GetLowestFCostPathNode(openList);
+            // pobieranie PathNoda o najni¿szej wartoœæi F
 
             if (currentNode == endNode)
+                // sprawdzanie czy currentNode jest koñcowym PathNode'em
             {
-                // Reached final node
-                // pathLength = endNode.GetFCost();
-                Debug.Log("chyba dziala");
                 return CalculatePath(endNode);
+                // zwracanie œcie¿ki
             }
 
             openList.Remove(currentNode);
             closedList.Add(currentNode);
 
-            foreach (PathNode neighbourNode in GetNeighbourList(currentNode))
+            ChecnkingNeighbourPathNodes(currentNode, endGridPosition, closedList, openList);
+            //Przeszukiwanie s¹siadów
+        }
+        
+        return null;
+        // brak œcie¿ki
+    }
+
+    void ChecnkingNeighbourPathNodes(PathNode currentNode, Vector3Int endGridPosition, List<PathNode> closedList, List<PathNode> openList)
+    {
+        foreach (PathNode neighbourNode in GetNeighbourList(currentNode))
+        // przeszukiwanie s¹siadów, w celu znalezienia mniejszej wartoœæi
+        {
+            if (closedList.Contains(neighbourNode))
             {
-                if (closedList.Contains(neighbourNode))
+                continue;
+            }
+
+            if (!neighbourNode.IsWalkable())
+            {
+                closedList.Add(neighbourNode);
+                continue;
+            }
+
+            int tentativeGCost = CalculateTentativeGCost(currentNode);
+            // obliczanie kosztu G dla currentNode
+
+            if (tentativeGCost < neighbourNode.GetGCost())
+            // sprawdzanie czy koszt G currentNode jest mniejszy od kosztu  s¹siada
+            {
+                //ustawianie wartoœæi dla neighbourNode
+                SetValueForNeighbourNode(currentNode, neighbourNode, endGridPosition, tentativeGCost);
+
+                if (!openList.Contains(neighbourNode))
                 {
-                    continue;
-                }
-
-                if (!neighbourNode.IsWalkable())
-                {
-                    closedList.Add(neighbourNode);
-                    continue;
-                }
-
-                int tentativeGCost =
-                    currentNode.GetGCost() + currentNode.GetExitCost();
-
-                if (tentativeGCost < neighbourNode.GetGCost())
-                {
-                    neighbourNode.SetPreviousPathNode(currentNode);
-                    neighbourNode.SetGCost(tentativeGCost);
-                    neighbourNode.SetHCost(CalculateDistance(neighbourNode.GetGridPosition(), endGridPosition));
-                    neighbourNode.CalculateFCost();
-
-                    if (!openList.Contains(neighbourNode))
-                    {
-                        Debug.Log("dodaje sasiada");
-                        openList.Add(neighbourNode);
-                    }
+                    openList.Add(neighbourNode);
                 }
             }
         }
+    }
 
-        // No path found
-        // pathLength = 0;
-        Debug.Log("problem");
-        return null;
+    private void RestartPathNodeValueInDictionary(Dictionary<Vector3Int, PathNode> pathNodeDictionary)
+    {
+        foreach (PathNode pathNode in pathNodeDictionary.Values)
+        {
+            // Resetowanie wsyztskich wartoœæi PathNode zanjduj¹cych siê w kolekcji
+            pathNode.ResetPathNode();
+        }
+    }
 
+    private void SetValueForStartNode( PathNode startNode, Vector3Int startGridPosition, Vector3Int endGridPosition)
+    {
+        startNode.SetGCost(0);
+        startNode.SetHCost(CalculateDistance(startGridPosition, endGridPosition));
+        startNode.CalculateFCost();
+    }
+    private void SetValueForNeighbourNode(PathNode currentNode, PathNode neighbourNode, Vector3Int endGridPosition, int tentativeGCost)
+    {
+        neighbourNode.SetPreviousPathNode(currentNode);
+        neighbourNode.SetGCost(tentativeGCost);
+        neighbourNode.SetHCost(CalculateDistance(neighbourNode.GetGridPosition(), endGridPosition));
+        neighbourNode.CalculateFCost();
+    }
+
+    private int CalculateTentativeGCost(PathNode currentNode)
+    {
+        return currentNode.GetGCost() + currentNode.GetExitCost();
     }
 
     private List<PathNode> GetNeighbourList(PathNode currentPathNode)

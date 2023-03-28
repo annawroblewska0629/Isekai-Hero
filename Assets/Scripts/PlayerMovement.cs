@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     PlayerControls playerControls;
     [SerializeField] CoreGame coreGame;
     [SerializeField] GameManager gameManager;
+    [SerializeField] Player player;
 
     [Header("MovementLimit")]
     [SerializeField] int movementLimit;
@@ -34,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
         PauseMenu.Instance.OnGameRestart += GameManager_OnGameRestarted;
         coreGame.OnPlayerEndLevel += CoreGame_OnPlayerEndLevel;
         gameManager.OnGameRestarted += GameManager_OnGameRestarted;
+        player.OnPlayerDead += GameManager_OnGameRestarted;
         // LevelGrid.Instance.SetIsNotWalkablePathNode(transform.position);
     }
 
@@ -70,8 +72,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 targetWorldPosition = transform.position + directionVector3;
         Vector3 behindTargetWorldPosition = transform.position + directionVector3 + directionVector3;
 
-        // do funkcji CanMove zostaje przekazana odczytana wartosc, gdy fukncja zwroci prawde obiekt gracza zostaje przemiszczony a limit porszania zmniejsza sie
-        if (TurnSystem.Instance.IsPlayerTurn() 
+        /*if (TurnSystem.Instance.IsPlayerTurn() 
             && LevelGrid.Instance.IsValidGridPosition(targetWorldPosition) 
             && !LevelGrid.Instance.IsPositionBlockedByEnemy(targetWorldPosition))
         {
@@ -79,7 +80,6 @@ public class PlayerMovement : MonoBehaviour
             transform.Translate(directionVector3);
             TurnSystem.Instance.StartEnemyTurn();
         }
-        // do funkcji CanMove zostaje przekazana odczytana wartosc, gdy fukncja zwraca prawde to kafelek na danej pozycji zostaje usuniety oraz zostaje utworozny na nowej, limit poruszana zmniejsza sie
         else if (TurnSystem.Instance.IsPlayerTurn()
             && LevelGrid.Instance.IsValidGridPositionToPush(targetWorldPosition, behindTargetWorldPosition)
             && !LevelGrid.Instance.IsPositionBlockedByEnemy(behindTargetWorldPosition))
@@ -90,7 +90,65 @@ public class PlayerMovement : MonoBehaviour
             transform.Translate(directionVector3);
             TurnSystem.Instance.StartEnemyTurn();
         }
+        */
+        MoveAction(directionVector3, targetWorldPosition);
+        PushAction(directionVector3, targetWorldPosition, behindTargetWorldPosition);
+    }
 
+    private void MoveAction(Vector3 directionVector3, Vector3 targetWorldPosition)
+    {
+        if (CanMove(targetWorldPosition)) 
+        {
+            UpdateMovementLimit();
+            transform.Translate(directionVector3);
+            TurnSystem.Instance.StartEnemyTurn();
+        }
+ 
+    }
+
+    private void PushAction(Vector3 directionVector3, Vector3 targetWorldPosition, Vector3 behindTargetWorldPosition)
+    {
+        if(CanPush(targetWorldPosition, behindTargetWorldPosition))
+        {
+            UpdateMovementLimit();
+            PushObstacle(targetWorldPosition, behindTargetWorldPosition);
+            transform.Translate(directionVector3);
+            TurnSystem.Instance.StartEnemyTurn();
+        }
+    }
+
+    private void PushObstacle(Vector3 targetWorldPosition, Vector3 behindTargetWorldPosition)
+    {
+        LevelGrid.Instance.UpdatePathNodeDictionary(targetWorldPosition, behindTargetWorldPosition);
+        LevelGrid.Instance.ChangeObstacleGridPosition(targetWorldPosition, behindTargetWorldPosition);
+    }
+
+    private bool CanMove(Vector3 targetWorldPosition)
+    {
+        if (TurnSystem.Instance.IsPlayerTurn()
+            && LevelGrid.Instance.IsValidGridPosition(targetWorldPosition)
+            && !LevelGrid.Instance.IsPositionBlockedByEnemy(targetWorldPosition))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private bool CanPush(Vector3 targetWorldPosition, Vector3 behindTargetWorldPosition)
+    {
+        if (TurnSystem.Instance.IsPlayerTurn()
+            && LevelGrid.Instance.IsValidGridPositionToPush(targetWorldPosition, behindTargetWorldPosition)
+            && !LevelGrid.Instance.IsPositionBlockedByEnemy(behindTargetWorldPosition))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private void MovementLimitReachedZero()

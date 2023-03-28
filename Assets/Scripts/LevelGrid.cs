@@ -5,7 +5,6 @@ using UnityEngine.Tilemaps;
 
 public class LevelGrid : MonoBehaviour
 {
-    public static LevelGrid Instance { get; private set; }
     private Dictionary<Vector3Int, Enemy> enemiesGridPositionDictionary = new Dictionary<Vector3Int, Enemy>();
     [SerializeField] private Grid grid;
     
@@ -27,15 +26,19 @@ public class LevelGrid : MonoBehaviour
 
     BoundsInt boundsInt;
     Dictionary<Vector3Int, PathNode> pathNodeDictionary = new Dictionary<Vector3Int, PathNode>();
+    
+    public static LevelGrid Instance { get; private set; }
+
     // Start is called before the first frame update
     void Start()
     {
         if (Instance != null)
         {
-            Debug.LogError("There is more than one EnemiesGridPositons!" + transform + " - " + Instance);
+            Debug.LogError("There is more than one LevelGrid!" + transform + " - " + Instance);
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
         boundsInt = groundTilemap.cellBounds;
         CreatePathNodeDictionary();
@@ -174,9 +177,8 @@ public class LevelGrid : MonoBehaviour
 
     public bool IsValidGridPosition(Vector3 worldPosition)
     {
-        // fukncja konwertuje pozycje na pozycje kafelkowa
-        // Gdy mapa sie konczy lub gracz napotka przeszkode w kierunku ktorym chce sie poruszyc fukncja zwaraca falsz
-        if (!groundTilemap.HasTile(WorldPositionToGridPosition(worldPosition)) || obstacleTilemap.HasTile(WorldPositionToGridPosition(worldPosition)))
+        if (!groundTilemap.HasTile(WorldPositionToGridPosition(worldPosition)) 
+            || obstacleTilemap.HasTile(WorldPositionToGridPosition(worldPosition)))
         {
             return false;
         }
@@ -187,8 +189,6 @@ public class LevelGrid : MonoBehaviour
     }
     public bool IsValidGridPosition(Vector3Int gridPosition)
     {
-        // fukncja konwertuje pozycje na pozycje kafelkowa
-        // Gdy mapa sie konczy lub gracz napotka przeszkode w kierunku ktorym chce sie poruszyc fukncja zwaraca falsz
         if (!groundTilemap.HasTile(gridPosition) || obstacleTilemap.HasTile(gridPosition))
         {
             return false;

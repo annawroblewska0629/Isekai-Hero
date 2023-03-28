@@ -10,6 +10,7 @@ public class ActionButton : MonoBehaviour
     private Action action;
     [SerializeField] private Button button;
     [SerializeField] private TextMeshProUGUI actionNameText;
+    [SerializeField] private TextMeshProUGUI costActionText;
     [SerializeField] private GameObject activeActionButtonVisual;
     private bool isPressed = false;
     // Start is called before the first frame update
@@ -29,6 +30,7 @@ public class ActionButton : MonoBehaviour
         this.action = action;
         
         actionNameText.text = action.GetActionName().ToUpper();
+        costActionText.text = "COST: " + action.GetActionPointsCost().ToString().ToUpper();
 
         button.onClick.AddListener(() =>
         {
